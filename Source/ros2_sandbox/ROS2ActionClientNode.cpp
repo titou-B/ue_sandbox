@@ -92,34 +92,33 @@ void AROS2ActionClientNode::ResultCallback(UROS2GenericAction* InAction)
 {
     UROS2FibonacciAction* FibonacciAction = Cast<UROS2FibonacciAction>(InAction);
 
-    example_interfaces__action__Fibonacci_GetResult_Response result_msg;
-    example_interfaces__action__Fibonacci_GetResult_Response__init(&result_msg);
+    // example_interfaces__action__Fibonacci_GetResult_Response result_msg;
+    // example_interfaces__action__Fibonacci_GetResult_Response__init(&result_msg);
 
-    auto data = FibonacciAction->GetResultResponse();
-    data = &result_msg;
+    // auto data = FibonacciAction->GetResultResponse();
+    // data = &result_msg;
 
-    // Structure pour recevoir l’en-tête de la réponse
-    rmw_request_id_t result_response_header;
+    // // Structure pour recevoir l’en-tête de la réponse
+    // rmw_request_id_t result_response_header;
 
-    UE_LOG_WITH_INFO(LogRos2SandBox, Error, TEXT("------- rcl_action_take_result_response"));
-    RCSOFTCHECK(rcl_action_take_result_response(&FibonacciActionClient->client, &result_response_header, data));
+    // UE_LOG_WITH_INFO(LogRos2SandBox, Error, TEXT("------- rcl_action_take_result_response"));
+    // RCSOFTCHECK(rcl_action_take_result_response(&FibonacciActionClient->client, &result_response_header, data));
 
-    UE_LOG_WITH_INFO_NAMED(LogRos2SandBox, Log, TEXT("Result received with status %d : "), result_msg.status);
-    FString DebugResultString;
-    for (size_t i = 0; i < result_msg.result.sequence.size; ++i) {
-        DebugResultString += FString::FromInt(result_msg.result.sequence.data[i]) + ", ";
-    }
-    UE_LOG(LogRos2SandBox, Warning, TEXT("%s"), *DebugResultString);
+    // UE_LOG_WITH_INFO_NAMED(LogRos2SandBox, Log, TEXT("Result received with status %d : "), result_msg.status);
+    // FString DebugResultString;
+    // for (size_t i = 0; i < result_msg.result.sequence.size; ++i) {
+    //     DebugResultString += FString::FromInt(result_msg.result.sequence.data[i]) + ", ";
+    // }
+    // UE_LOG(LogRos2SandBox, Warning, TEXT("%s"), *DebugResultString);
 
     FROSFibonacciGRRes resultResponse;
     FibonacciAction->GetResultResponse(resultResponse);
-
 
     // Log request and response
     FString resultString;
     for (int s : resultResponse.Sequence)
     {
-        UE_LOG_WITH_INFO_NAMED(LogRos2SandBox, Log, TEXT("%d, "), s);
+        // UE_LOG_WITH_INFO_NAMED(LogRos2SandBox, Log, TEXT("%d, "), s);
         resultString += FString::FromInt(s) + ", ";
     }
     UE_LOG_WITH_INFO_NAMED(
@@ -144,16 +143,12 @@ void AROS2ActionClientNode::GoalResponseCallback(UROS2GenericAction* InAction)
         UE_LOG_WITH_INFO_NAMED(
             LogRos2SandBox, Log, TEXT("[%s][C++][receive goal response callback] goal request is accepted."), *ActionName);
 
-        // // → Récupérer le goal ID utilisé
-        // FROSFibonacciSGReq sentGoal;
-        // FibonacciAction->GetGoalRequest(sentGoal);
+        // → Le copier dans la requête de résultat
+        FROSFibonacciGRReq resultRequest;
+        FibonacciAction->SetGoalIdToResultRequest(resultRequest);
 
-        // // → Le copier dans la requête de résultat
-        // FROSFibonacciGRReq resultRequest;
-        // resultRequest.GoalId = sentGoal.GoalId;
-
-        // // → Appliquer et envoyer
-        // FibonacciAction->SetResultRequest(resultRequest);
+        // → Appliquer et envoyer
+        FibonacciAction->SetResultRequest(resultRequest);
 
         FibonacciActionClient->SendResultRequest();
     }
